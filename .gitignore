@@ -1,7 +1,10 @@
 # Python 虚拟环境
 venv/
+.venv/
 *.pyc
 __pycache__/
+*.py[cod]
+*$py.class
 
 # Streamlit 相关
 .streamlit/secrets.toml
@@ -20,6 +23,8 @@ user_config/
 # IDE 相关文件
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # 操作系统生成的文件
 .DS_Store
@@ -28,7 +33,6 @@ Thumbs.db
 # 临时文件
 *.tmp
 *.bak
-*.swp
 
 # 其他可能包含敏感信息的文件
 *.pem
