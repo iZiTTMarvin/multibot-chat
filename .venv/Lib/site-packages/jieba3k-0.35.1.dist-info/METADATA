@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: jieba3k
+Version: 0.35.1
+Summary: Chinese Words Segementation Utilities
+Home-page: http://github.com/fxsjy
+Author: Sun, Junyi
+Author-email: ccnusjy@gmail.com
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: summary

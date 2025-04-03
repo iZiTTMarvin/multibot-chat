@@ -1,0 +1,13 @@
+下次如何正确启动项目：
+	首先，确保你在项目目录下：
+	cd d:\visual_ProgrammingSoftware\xiang_mu
+
+激活虚拟环境：
+	.venv\Scripts\activate
+	(你会看到命令提示符前面出现 (.venv))
+
+使用 Streamlit 命令启动应用：
+	streamlit run multibot-chat/app.py
+
+本地 URL: http://localhost:8501
+网络 URL: http://172.26.150.228:8501

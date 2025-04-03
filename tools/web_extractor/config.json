@@ -1,0 +1,10 @@
+{
+    "name": "提取网页",
+    "description": "从消息中提取链接，爬取链接网页并提取其中的标题和正文，最多可以返回3个页面",
+    "main_file": "web_extractor.py",
+    "parameter": {
+        "max_url_count": 3,
+        "min_text_length": 100,
+        "retry_length": 250
+    }
+}
