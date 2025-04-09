@@ -1,13 +1,38 @@
 下次如何正确启动项目：
 	首先，确保你在项目目录下：
-	cd d:\visual_ProgrammingSoftware\xiang_mu
-
+	cd d:\visual_ProgrammingSoftware\xiang_mu\multibot-chat
 激活虚拟环境：
 	.venv\Scripts\activate
 	(你会看到命令提示符前面出现 (.venv))
 
 使用 Streamlit 命令启动应用：
-	streamlit run multibot-chat/app.py
+	streamlit run app.py
+
+或者使用完整路径运行：
+	streamlit run d:\visual_ProgrammingSoftware\xiang_mu\multibot-chat\app.py
 
 本地 URL: http://localhost:8501
 网络 URL: http://172.26.150.228:8501
+
+
+
+当前看到的界面是 MultiBot-Chat 的主页面，这个界面的代码主要分布在以下几个文件中：
+
+app.py - 这是应用程序的主入口文件，它负责：
+设置页面配置和标题
+加载 CSS 样式
+处理用户登录状态
+根据当前页面状态加载不同的页面组件
+custom_pages/main_page.py - 这是您当前看到的主页面的核心代码，它负责：
+显示"开始对话吧"的标题和说明
+创建聊天输入框
+显示新话题按钮
+显示已启用的机器人对话界面
+custom_pages/utils/sidebar.py - 这是侧边栏的代码，负责显示：
+用户信息
+机器人设置
+本地私人助手选项
+退出登录按钮等
+custom_pages/utils/welcome_message.py - 显示欢迎信息
+custom_pages/utils/bot_display.py - 负责显示活跃和非活跃的机器人对话界面
+如果您想修改当前看到的主页面，主要需要编辑 custom_pages/main_page.py 文件。如果您想修改侧边栏，则需要编辑 custom_pages/utils/sidebar.py 文件。

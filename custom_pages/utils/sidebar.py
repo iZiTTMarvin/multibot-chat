@@ -5,6 +5,11 @@ from utils.user_manager import user_manager
 from custom_pages.utils.dialogs import edit_bot, add_new_bot, edit_bot_config
 import logging
 import re
+from openai import OpenAI
+import subprocess
+import json
+import time
+import requests
 
 LOGGER = logging.getLogger(__name__)
 
@@ -113,6 +118,124 @@ def render_sidebar():
 
                     if st.button("清理所有历史话题", use_container_width=True):
                         confirm_action_clear_historys()
+
+        # 添加本地私人助手区域
+        with st.expander("🔒 本地私人助手", expanded=True):
+            st.markdown("选择本地Ollama模型，无需联网，保护隐私")
+            
+            # 初始化会话状态
+            if 'selected_local_model' not in st.session_state:
+                st.session_state.selected_local_model = None
+            
+            # 检查Ollama服务是否运行
+            def check_ollama_running():
+                try:
+                    client = OpenAI(
+                        api_key="ollama",
+                        base_url="http://127.0.0.1:11434/v1",
+                    )
+                    # 尝试获取模型列表
+                    response = requests.get("http://127.0.0.1:11434/api/tags")
+                    return True, response.json().get('models', [])
+                except Exception as e:
+                    return False, str(e)
+            
+            # 检查模型是否已下载
+            def is_model_downloaded(model_name, model_list):
+                return any(model.get('name') == model_name for model in model_list)
+            
+            # 运行模型
+            def run_model(model_name):
+                try:
+                    # 使用subprocess运行命令
+                    process = subprocess.Popen(
+                        ["ollama", "run", model_name],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                        bufsize=1,
+                        universal_newlines=True
+                    )
+                    
+                    # 模型运行成功
+                    st.success(f"模型 {model_name} 已启动!")
+                    return True
+                except Exception as e:
+                    st.error(f"启动模型时出错: {str(e)}")
+                    return False
+            
+            # 创建两个模型选项
+            col1, col2 = st.columns(2)
+            
+            # 检查Ollama服务状态
+            ollama_running, model_list = check_ollama_running()
+            
+            with col1:
+                if st.button("🤖 独特小Q\nqwen2.5:3b", use_container_width=True, key="select_qwen"):
+                    if not ollama_running:
+                        st.error("Ollama服务未运行，请先启动Ollama服务")
+                    else:
+                        model_name = "qwen2.5:3b"
+                        if not is_model_downloaded(model_name, model_list):
+                            st.warning(f"模型 {model_name} 未下载，请先使用命令下载: ollama pull {model_name}")
+                        else:
+                            # 运行模型
+                            run_model(model_name)
+                            # 设置选中的模型
+                            st.session_state.selected_local_model = {
+                                "name": "qwen2.5:3b",
+                                "display_name": "独特小Q",
+                                "system_prompt": "你是一个有用的本地私人助手，基于Ollama的qwen2.5:3b模型。你要记住当用户询问你是谁时，你要回答你是许皓辰的私人模型。你会尽可能提供有用、安全和诚实的回答。"
+                            }
+                            # 设置标志来指示应该显示独立问答界面
+                            st.session_state.show_local_assistant = True
+                            st.rerun()
+            
+            with col2:
+                if st.button("🐋 Meta Llama\nllama3.2.8b:latest", use_container_width=True, key="select_llama"):
+                    if not ollama_running:
+                        st.error("Ollama服务未运行，请先启动Ollama服务")
+                    else:
+                        model_name = "llama3.2.8b:latest"
+                        if not is_model_downloaded(model_name, model_list):
+                            st.warning(f"模型 {model_name} 未下载，请先使用命令下载: ollama pull {model_name}")
+                        else:
+                            # 运行模型
+                            run_model(model_name)
+                            # 设置选中的模型
+                            st.session_state.selected_local_model = {
+                                "name": "llama3.2.8b:latest",
+                                "display_name": "Meta Llama 3",
+                                "system_prompt": "你是一个有用的本地私人助手，基于Ollama的llama3.2.8b:latest模型。你要记住当用户询问你是谁时，你要回答你是许皓辰的私人模型。你会尽可能提供有用、安全和诚实的回答。"
+                            }
+                            # 设置标志来指示应该显示独立问答界面
+                            st.session_state.show_local_assistant = True
+                            st.rerun()
+            
+            # 显示当前选择的模型
+            if st.session_state.selected_local_model:
+                st.success(f"当前选择的模型: {st.session_state.selected_local_model['display_name']} ({st.session_state.selected_local_model['name']})")
+            
+            # 显示Ollama状态
+            if ollama_running:
+                st.success("Ollama服务正在运行")
+                # 显示已下载的模型
+                if model_list:
+                    st.markdown("**已下载的模型:**")
+                    for model in model_list:
+                        st.markdown(f"- **{model.get('name')}** ({model.get('size', '?')}MB)")
+            else:
+                st.error("Ollama服务未运行，请先启动Ollama服务")
+            
+            # 添加说明
+            st.markdown("**使用说明:**")
+            st.markdown("1. 下载并安装[Ollama](https://ollama.com/)")
+            st.markdown("2. 启动Ollama服务")
+            st.markdown("3. 点击上方模型按钮，在右侧显示独立问答界面")
+            
+            # 初始化独立问答界面标志
+            if 'show_local_assistant' not in st.session_state:
+                st.session_state.show_local_assistant = False
 
         with st.expander("Bot管理"):
             with st.container():
