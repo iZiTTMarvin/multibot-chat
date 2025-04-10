@@ -1,4 +1,7 @@
 # *-* coding:utf-8 *-*
+
+# 主程序入口，Streamlit应用的核心逻辑
+
 import streamlit as st
 import os
 import importlib

@@ -164,53 +164,90 @@ def render_sidebar():
                     st.error(f"启动模型时出错: {str(e)}")
                     return False
             
-            # 创建两个模型选项
-            col1, col2 = st.columns(2)
-            
             # 检查Ollama服务状态
             ollama_running, model_list = check_ollama_running()
             
-            with col1:
-                if st.button("🤖 独特小Q\nqwen2.5:3b", use_container_width=True, key="select_qwen"):
-                    if not ollama_running:
-                        st.error("Ollama服务未运行，请先启动Ollama服务")
-                    else:
-                        model_name = "qwen2.5:3b"
-                        if not is_model_downloaded(model_name, model_list):
-                            st.warning(f"模型 {model_name} 未下载，请先使用命令下载: ollama pull {model_name}")
-                        else:
-                            # 运行模型
-                            run_model(model_name)
-                            # 设置选中的模型
-                            st.session_state.selected_local_model = {
-                                "name": "qwen2.5:3b",
-                                "display_name": "独特小Q",
-                                "system_prompt": "你是一个有用的本地私人助手，基于Ollama的qwen2.5:3b模型。你要记住当用户询问你是谁时，你要回答你是许皓辰的私人模型。你会尽可能提供有用、安全和诚实的回答。"
-                            }
-                            # 设置标志来指示应该显示独立问答界面
-                            st.session_state.show_local_assistant = True
-                            st.rerun()
+            # 定义常用模型的显示名称和系统提示词
+            model_display_names = {
+                "qwen2.5:3b": "🤖 独特小Q",
+                "llama3.2.8b:latest": "🐋 Meta Llama 3",
+                "mistral:latest": "🌟 Mistral AI",
+                "gemma:latest": "💎 Gemma",
+                "phi3:latest": "🔮 Phi-3",
+                "llama3:latest": "🦙 Llama 3",
+                "codellama:latest": "👨‍💻 Code Llama",
+                "dolphin-mistral:latest": "🐬 Dolphin"
+            }
             
-            with col2:
-                if st.button("🐋 Meta Llama\nllama3.2.8b:latest", use_container_width=True, key="select_llama"):
-                    if not ollama_running:
-                        st.error("Ollama服务未运行，请先启动Ollama服务")
-                    else:
-                        model_name = "llama3.2.8b:latest"
-                        if not is_model_downloaded(model_name, model_list):
-                            st.warning(f"模型 {model_name} 未下载，请先使用命令下载: ollama pull {model_name}")
-                        else:
-                            # 运行模型
-                            run_model(model_name)
+            # 默认系统提示词模板
+            default_system_prompt = "你是一个有用的本地私人助手，基于Ollama的{model_name}模型。你要记住当用户询问你是谁时，你要回答你是许皓辰的私人模型。你会尽可能提供有用、安全和诚实的回答。"
+            
+            if ollama_running:
+                # 从Ollama获取可用模型列表
+                available_models = []
+                for model in model_list:
+                    model_name = model.get('name')
+                    # 使用预定义名称或原始名称
+                    display_name = model_display_names.get(model_name, f"📦 {model_name}")
+                    available_models.append({"name": model_name, "display_name": display_name})
+                
+                # 如果有可用模型
+                if available_models:
+                    # 创建选择模型的下拉框
+                    st.markdown("### 选择本地模型")
+                    
+                    # 准备下拉框选项
+                    model_options = [f"{m['display_name']} ({m['name']})" for m in available_models]
+                    selected_model_index = 0
+                    
+                    # 如果已经选择了模型，找到它在列表中的索引
+                    if st.session_state.selected_local_model:
+                        current_model_name = st.session_state.selected_local_model['name']
+                        for i, m in enumerate(available_models):
+                            if m['name'] == current_model_name:
+                                selected_model_index = i
+                                break
+                    
+                    # 显示下拉框
+                    selected_option = st.selectbox(
+                        "可用的本地模型",
+                        options=range(len(model_options)),
+                        format_func=lambda i: model_options[i],
+                        index=selected_model_index,
+                        key="local_model_selector"
+                    )
+                    
+                    # 获取选择的模型信息
+                    selected_model = available_models[selected_option]
+                    
+                    # 添加自定义系统提示词
+                    system_prompt = st.text_area(
+                        "系统提示词", 
+                        value=st.session_state.selected_local_model.get('system_prompt', default_system_prompt.format(model_name=selected_model['name'])) if st.session_state.selected_local_model else default_system_prompt.format(model_name=selected_model['name']),
+                        key="local_model_system_prompt",
+                        height=100
+                    )
+                    
+                    # 启动模型按钮
+                    if st.button("启动选中的模型", use_container_width=True, key="start_selected_model"):
+                        # 运行模型
+                        if run_model(selected_model['name']):
                             # 设置选中的模型
                             st.session_state.selected_local_model = {
-                                "name": "llama3.2.8b:latest",
-                                "display_name": "Meta Llama 3",
-                                "system_prompt": "你是一个有用的本地私人助手，基于Ollama的llama3.2.8b:latest模型。你要记住当用户询问你是谁时，你要回答你是许皓辰的私人模型。你会尽可能提供有用、安全和诚实的回答。"
+                                "name": selected_model['name'],
+                                "display_name": selected_model['display_name'],
+                                "system_prompt": system_prompt
                             }
                             # 设置标志来指示应该显示独立问答界面
                             st.session_state.show_local_assistant = True
                             st.rerun()
+                else:
+                    st.warning("未检测到已安装的Ollama模型。请使用'ollama pull <model_name>'命令安装模型。")
+                    st.code("ollama pull llama3.2.8b:latest", language="bash")
+                    st.code("ollama pull qwen2.5:3b", language="bash")
+            else:
+                st.error("Ollama服务未运行，请先启动Ollama服务")
+                st.code("ollama serve", language="bash")
             
             # 显示当前选择的模型
             if st.session_state.selected_local_model:

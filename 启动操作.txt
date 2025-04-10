@@ -1,6 +1,6 @@
 下次如何正确启动项目：
 	首先，确保你在项目目录下：
-	cd d:\visual_ProgrammingSoftware\xiang_mu\multibot-chat
+	cd d:\visual_ProgrammingSoftware\Projects\multibot-chat
 激活虚拟环境：
 	.venv\Scripts\activate
 	(你会看到命令提示符前面出现 (.venv))
@@ -9,7 +9,7 @@
 	streamlit run app.py
 
 或者使用完整路径运行：
-	streamlit run d:\visual_ProgrammingSoftware\xiang_mu\multibot-chat\app.py
+	streamlit run d:\visual_ProgrammingSoftware\Projects\multibot-chat\app.py
 
 本地 URL: http://localhost:8501
 网络 URL: http://172.26.150.228:8501
@@ -36,3 +36,57 @@ custom_pages/utils/sidebar.py - 这是侧边栏的代码，负责显示：
 custom_pages/utils/welcome_message.py - 显示欢迎信息
 custom_pages/utils/bot_display.py - 负责显示活跃和非活跃的机器人对话界面
 如果您想修改当前看到的主页面，主要需要编辑 custom_pages/main_page.py 文件。如果您想修改侧边栏，则需要编辑 custom_pages/utils/sidebar.py 文件。
+
+我们已经成功地将你的项目更新推送到了GitHub上。让我总结一下我们刚才完成的操作：
+
+我们首先检查了Git仓库的状态，发现有几个文件被修改
+我们将这些修改添加到了暂存区 (git add .)
+我们提交了这些更改 (git commit -m "更新项目版本")
+我们更新了远程仓库的URL，移除了过期的令牌
+我们成功地将更改推送到了GitHub (git push)
+下次如果你想再次提交新版本，只需按照以下步骤操作：
+查看更改状态：
+CopyInsert
+git status
+添加更改的文件：
+CopyInsert
+git add .
+或者添加特定文件：
+CopyInsert
+git add 文件名
+提交更改：
+CopyInsert
+git commit -m "提交说明"
+(在引号中写上你对这次更改的简短描述)
+推送到GitHub：
+CopyInsert
+git push
+
+
+
+
+核心文件
+app.py - 主程序入口，Streamlit应用的核心逻辑
+config.py - 配置文件，存储API密钥等敏感信息
+requirements.txt - Python依赖包列表
+机器人相关
+bot/ - 存放不同聊天机器人的实现代码
+tools/ - 辅助工具和功能模块
+前端相关
+.streamlit/ - Streamlit配置文件
+static/ - 静态资源文件(图片/CSS等)
+custom_pages/ - 自定义页面组件
+部署相关
+start_server.bat/.sh - 启动脚本
+.gitignore - Git忽略规则
+LICENSE - 开源许可证
+README.md - 项目说明文档
+用户数据
+user_config/ - 用户个性化配置
+users.json - 用户账号信息
+开发环境
+.venv/ - Python虚拟环境
+__pycache__/ - Python缓存文件
+版本控制
+.git/ - Git版本库
+.gitee/ - Gitee平台相关配置
